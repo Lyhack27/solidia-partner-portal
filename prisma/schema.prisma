@@ -12,6 +12,7 @@ model User {
   email    String  @unique
   password String
   role     String  @default("partner")
+  notes    Note[]
 }
 
 model Project {
@@ -21,7 +22,18 @@ model Project {
   status      String     @default("pending")
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
+  notes       Note[]
+}
 
+model Note {
+  id        String   @id @default(cuid())
+  text      String
+  projectId String
+  userId    Int
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 

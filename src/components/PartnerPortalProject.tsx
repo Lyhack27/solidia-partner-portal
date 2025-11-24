@@ -4,16 +4,106 @@ import { signOut } from "next-auth/react";
 
 const PROJECT_ID = "solar-automation-project";
 
+interface Note {
+  id: string;
+  text: string;
+  createdAt: string;
+  userId?: number;
+  user?: {
+    email: string;
+    role: string;
+  };
+}
+
 export default function PartnerPortalProject() {
   const [view, setView] = useState("projects");
   const [projectStatus, setProjectStatus] = useState<"pending" | "approved">("pending");
   const [loading, setLoading] = useState(true);
-  const [notes, setNotes] = useState<string[]>([]);
+  const [notes, setNotes] = useState<Note[]>([]);
   const [noteInput, setNoteInput] = useState("");
+  const [loadingNotes, setLoadingNotes] = useState(false);
 
   useEffect(() => {
-    setLoading(false);
+    loadProjectData();
   }, []);
+
+  const loadProjectData = async () => {
+    try {
+      const response = await fetch(`/api/projects/${PROJECT_ID}`);
+      if (response.ok) {
+        const data = await response.json();
+        setProjectStatus(data.status);
+      }
+    } catch (error) {
+      console.error("Error loading project:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Load notes when viewing project detail
+  useEffect(() => {
+    if (view === "projectDetail") {
+      loadNotes();
+    }
+  }, [view]);
+
+  const loadNotes = async () => {
+    setLoadingNotes(true);
+    try {
+      const response = await fetch(`/api/projects/${PROJECT_ID}/notes`);
+      if (response.ok) {
+        const data = await response.json();
+        setNotes(data);
+      }
+    } catch (error) {
+      console.error("Error loading notes:", error);
+    } finally {
+      setLoadingNotes(false);
+    }
+  };
+
+  const handleAddNote = async () => {
+    if (!noteInput.trim()) return;
+
+    try {
+      const response = await fetch(`/api/projects/${PROJECT_ID}/notes`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: noteInput.trim() }),
+      });
+
+      if (response.ok) {
+        const newNote = await response.json();
+        setNotes(prev => [newNote, ...prev]);
+        setNoteInput("");
+      } else {
+        const err = await response.json();
+        alert(`Failed to add note: ${err.error || response.statusText}`);
+      }
+    } catch (error) {
+      console.error("Error adding note:", error);
+      alert("Failed to add note.");
+    }
+  };
+
+  const handleDeleteNote = async (noteId: string) => {
+    try {
+      const response = await fetch(`/api/projects/${PROJECT_ID}/notes/${noteId}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        setNotes(prev => prev.filter(n => n.id !== noteId));
+      } else {
+        const err = await response.json();
+        alert(`Failed to delete note: ${err.error || response.statusText}`);
+      }
+    } catch (error) {
+      console.error("Error deleting note:", error);
+      alert("Failed to delete note.");
+    }
+  };
 
   const handleApprove = async () => {
     try {
@@ -51,6 +141,9 @@ export default function PartnerPortalProject() {
         <nav className="flex flex-col gap-4 text-gray-300 flex-1">
           <button onClick={() => setView("projects")} className="text-left hover:text-white transition">
             Projects
+          </button>
+          <button onClick={() => setView("bots")} className="text-left hover:text-white transition">
+            Bots in the Cloud
           </button>
         </nav>
         <button
@@ -207,8 +300,8 @@ export default function PartnerPortalProject() {
               <button
                 onClick={handleApprove}
                 className={`px-8 py-3 rounded-xl font-bold text-lg transition-all duration-300 shadow-lg ${projectStatus === "approved"
-                    ? "bg-green-700 opacity-50 cursor-not-allowed"
-                    : "bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 hover:scale-105 hover:shadow-green-500/50"
+                  ? "bg-green-700 opacity-50 cursor-not-allowed"
+                  : "bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 hover:scale-105 hover:shadow-green-500/50"
                   }`}
                 disabled={projectStatus === "approved"}
               >
@@ -227,37 +320,110 @@ export default function PartnerPortalProject() {
                 placeholder="Enter your note here..."
               />
               <button
-                onClick={() => {
-                  if (noteInput.trim()) {
-                    setNotes(prev => [...prev, noteInput.trim()]);
-                    setNoteInput("");
-                  }
-                }}
+                onClick={handleAddNote}
                 className="px-6 py-2 bg-blue-600 rounded-md hover:bg-blue-500 transition font-semibold"
               >
                 Add Note
               </button>
 
-              {notes.length > 0 && (
+              {loadingNotes ? (
+                <p className="mt-6 text-gray-400">Loading notes...</p>
+              ) : notes.length > 0 ? (
                 <ul className="mt-6 space-y-3">
-                  {notes.map((n, idx) => (
-                    <li key={idx} className="flex items-start justify-between bg-gray-800/50 p-4 rounded-lg border border-gray-700">
-                      <span className="text-gray-200 flex-1">{n}</span>
-                      <button
-                        onClick={() => setNotes(prev => prev.filter((_, i) => i !== idx))}
-                        className="ml-4 text-red-400 hover:text-red-300 font-semibold transition"
-                      >
-                        Delete
-                      </button>
+                  {notes.map((note) => (
+                    <li key={note.id} className="flex flex-col bg-gray-800/50 p-4 rounded-lg border border-gray-700">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <p className="text-gray-200 mb-2">{note.text}</p>
+                          <p className="text-xs text-gray-500">
+                            {note.user?.email ? `By ${note.user.email} • ` : ''}{new Date(note.createdAt).toLocaleString()}
+                          </p>
+                        </div>
+                        <button
+                          onClick={() => handleDeleteNote(note.id)}
+                          className="ml-4 text-red-400 hover:text-red-300 font-semibold transition"
+                        >
+                          Delete
+                        </button>
+                      </div>
                     </li>
                   ))}
                 </ul>
+              ) : (
+                <p className="mt-6 text-gray-400">No notes yet. Add your first note above!</p>
               )}
             </div>
 
             <button onClick={() => setView("projects")} className="px-6 py-3 bg-gray-600 rounded-xl hover:bg-gray-500 transition mt-8 font-semibold">
               ← Back to Projects
             </button>
+          </div>
+        )}
+
+        {/* Bots in the Cloud View */}
+        {view === "bots" && (
+          <div>
+            <h1 className="text-3xl font-bold mb-6">Bots in the Cloud</h1>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+              {/* Stats Cards */}
+              <div className="p-6 rounded-2xl shadow-lg" style={{ backgroundColor: "#10233f" }}>
+                <h3 className="text-gray-400 text-sm mb-2">Active Bots</h3>
+                <p className="text-4xl font-bold text-blue-400">0</p>
+                <p className="text-xs text-gray-500 mt-2">No bots deployed yet</p>
+              </div>
+
+              <div className="p-6 rounded-2xl shadow-lg" style={{ backgroundColor: "#10233f" }}>
+                <h3 className="text-gray-400 text-sm mb-2">Total Requests</h3>
+                <p className="text-4xl font-bold text-green-400">0</p>
+                <p className="text-xs text-gray-500 mt-2">Waiting for first request</p>
+              </div>
+
+              <div className="p-6 rounded-2xl shadow-lg" style={{ backgroundColor: "#10233f" }}>
+                <h3 className="text-gray-400 text-sm mb-2">Uptime</h3>
+                <p className="text-4xl font-bold text-purple-400">0%</p>
+                <p className="text-xs text-gray-500 mt-2">No data available</p>
+              </div>
+            </div>
+
+            {/* Chart Section */}
+            <div className="p-8 rounded-2xl shadow-xl" style={{ backgroundColor: "#10233f" }}>
+              <h2 className="text-2xl font-semibold mb-6">Bot Activity (Last 7 Days)</h2>
+              <div className="relative h-64 flex items-end justify-around gap-4 border-b border-gray-700 pb-4">
+                {/* Simple bar chart with 7 bars showing 0 activity */}
+                {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day, i) => (
+                  <div key={i} className="flex-1 flex flex-col items-center">
+                    <div className="w-full bg-gray-700 rounded-t-lg transition-all hover:bg-gray-600" style={{ height: '4px' }}>
+                      {/* Empty bar representing 0 activity */}
+                    </div>
+                    <span className="text-xs text-gray-500 mt-2">{day}</span>
+                    <span className="text-xs text-gray-600">0</span>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-6 text-center text-gray-400">
+                <p className="text-sm">No bot activity recorded yet. Deploy your first bot to see data here.</p>
+              </div>
+            </div>
+
+            {/* Coming Soon Section */}
+            <div className="mt-8 p-6 rounded-2xl border-2 border-dashed border-gray-700" style={{ backgroundColor: "#0e1d35" }}>
+              <h3 className="text-xl font-bold mb-3 text-blue-400">🚀 Coming Soon</h3>
+              <ul className="space-y-2 text-gray-300">
+                <li className="flex items-center gap-2">
+                  <span className="text-blue-500">•</span> Deploy custom AI bots
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-blue-500">•</span> Real-time monitoring dashboard
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-blue-500">•</span> Performance analytics
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-blue-500">•</span> Automated scaling
+                </li>
+              </ul>
+            </div>
           </div>
         )}
       </main>

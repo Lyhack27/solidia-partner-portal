@@ -2,7 +2,7 @@ const Database = require('better-sqlite3');
 const path = require('path');
 const bcrypt = require('bcrypt');
 
-const dbPath = path.join(__dirname, '../dev.db');
+const dbPath = path.join(__dirname, '../dev-v2.db');
 console.log('Opening DB at:', dbPath);
 
 const db = new Database(dbPath);

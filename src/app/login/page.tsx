@@ -33,7 +33,7 @@ export default function LoginPage() {
       }
 
       console.log("Login success, redirecting...");
-      router.push("/dashboard");
+      router.push("/projects/solar-automation-project");
     } catch (err) {
       console.error("SignIn exception:", err);
       setError("An unexpected error occurred.");
@@ -93,7 +93,7 @@ export default function LoginPage() {
 
         {/* GOOGLE LOGIN */}
         <button
-          onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
+          onClick={() => signIn("google", { callbackUrl: "/projects/solar-automation-project" })}
           className="w-full py-3 bg-white text-black rounded-lg font-semibold hover:bg-gray-200 transition"
         >
           Login with Google
