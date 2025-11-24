@@ -21,13 +21,6 @@ export default function Sidebar() {
           Projects
         </button>
 
-        <button onClick={() => router.push("/documents")} className="text-left hover:text-white">
-          Documents
-        </button>
-
-        <button onClick={() => router.push("/feedback")} className="text-left hover:text-white">
-          Feedback
-        </button>
 
         <button
           onClick={() => router.push("/api/auth/signout")}

@@ -11,23 +11,33 @@ export default function LoginPage() {
   async function handleSubmit(e: any) {
     e.preventDefault();
     setError("");
+    console.log("Submitting login form...");
 
     const formData = new FormData(e.target);
     const email = formData.get("email");
     const password = formData.get("password");
+    console.log("Credentials:", { email, password });
 
-    const res = await signIn("credentials", {
-      email,
-      password,
-      redirect: false,
-    });
+    try {
+      const res = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+      });
+      console.log("SignIn result:", res);
 
-    if (res?.error) {
-      setError("Invalid email or password.");
-      return;
+      if (res?.error) {
+        console.error("Login error:", res.error);
+        setError("Invalid email or password.");
+        return;
+      }
+
+      console.log("Login success, redirecting...");
+      router.push("/dashboard");
+    } catch (err) {
+      console.error("SignIn exception:", err);
+      setError("An unexpected error occurred.");
     }
-
-    router.push("/dashboard"); // adjust if needed
   }
 
   return (

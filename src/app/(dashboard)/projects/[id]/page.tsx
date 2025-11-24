@@ -1,4 +1,4 @@
-import PartnerPortalProject from "../../../components/PartnerPortalProject";
+import PartnerPortalProject from "../../../../components/PartnerPortalProject";
 
 
 export default function ProjectDetailPage({ params }) {

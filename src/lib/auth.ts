@@ -1,52 +1,63 @@
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcrypt";
-import NextAuth from "next-auth";
+import NextAuth, { NextAuthOptions } from "next-auth";
 
-import Google from "next-auth/providers/google";
-import Credentials from "next-auth/providers/credentials";
+import GoogleProvider from "next-auth/providers/google";
+import CredentialsProvider from "next-auth/providers/credentials";
 
-const prisma = new PrismaClient();
+import { prisma } from "@/lib/prisma";
 
-export const {
-  handlers: { GET, POST },
-  auth,
-  signIn,
-  signOut,
-} = NextAuth({
+export const authOptions: NextAuthOptions = {
   session: {
     strategy: "jwt",
   },
 
   providers: [
     // --- GOOGLE LOGIN ---
-    Google({
+    GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
 
     // --- CREDENTIALS LOGIN ---
-    Credentials({
+    CredentialsProvider({
       name: "credentials",
+      credentials: {
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" },
+      },
 
       async authorize(credentials) {
+        console.log("Authorize called with:", credentials?.email);
         if (!credentials?.email || !credentials?.password) return null;
 
-        // Find user
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email },
-        });
+        try {
+          // Find user
+          const user = await prisma.user.findUnique({
+            where: { email: credentials.email },
+          });
+          console.log("User found:", user ? user.email : "null");
 
-        if (!user) return null;
+          if (!user) return null;
 
-        // Verify password
-        const isValid = await bcrypt.compare(
-          credentials.password,
-          user.password
-        );
+          // Verify password
+          const isValid = await bcrypt.compare(
+            credentials.password,
+            user.password
+          );
+          console.log("Password valid:", isValid);
 
-        if (!isValid) return null;
+          if (!isValid) return null;
 
-        return user;
+          return {
+            id: String(user.id),
+            email: user.email,
+            role: user.role,
+          };
+        } catch (error) {
+          console.error("Authorize error:", error);
+          return null;
+        }
       },
     }),
   ],
@@ -63,10 +74,10 @@ export const {
 
     async session({ session, token }) {
       if (session.user) {
-        session.user.id = token.id as string;
+        session.user.id = String(token.id);
         session.user.role = token.role as string;
       }
       return session;
     },
   },
-});
+};

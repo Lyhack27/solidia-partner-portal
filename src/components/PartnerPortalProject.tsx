@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 
 export default function PartnerPortalProject() {
-  const [view, setView] = useState("dashboard");
+  const [view, setView] = useState("projects");
 
   return (
     <div className="flex min-h-screen text-white" style={{ backgroundColor: "#0a1a2f" }}>
@@ -10,20 +10,11 @@ export default function PartnerPortalProject() {
       <aside className="w-64 p-6 flex flex-col gap-6 shadow-lg" style={{ backgroundColor: "#081526" }}>
         <h2 className="text-xl font-semibold mb-4">SOLIDIA Panel</h2>
         <nav className="flex flex-col gap-4 text-gray-300">
-          <button onClick={() => setView("dashboard")} className="text-left hover:text-white transition">
-            Dashboard
-          </button>
           <button onClick={() => setView("projects")} className="text-left hover:text-white transition">
             Projects
           </button>
           <button onClick={() => setView("bots")} className="text-left hover:text-white transition">
             Bots in the Cloud
-          </button>
-          <button onClick={() => setView("documents")} className="text-left hover:text-white transition">
-            Documents
-          </button>
-          <button onClick={() => setView("feedback")} className="text-left hover:text-white transition">
-            Feedback
           </button>
         </nav>
       </aside>
@@ -31,13 +22,7 @@ export default function PartnerPortalProject() {
       {/* Main Content */}
       <main className="flex-1 p-8 overflow-y-auto">
 
-        {/* DASHBOARD VIEW */}
-        {view === "dashboard" && (
-          <div>
-            <h1 className="text-3xl font-bold mb-6">Dashboard</h1>
-            <p className="text-gray-300">Welcome to the SOLIDIA Partner Dashboard.</p>
-          </div>
-        )}
+
 
         {/* PROJECTS VIEW */}
         {view === "projects" && (
@@ -156,21 +141,7 @@ export default function PartnerPortalProject() {
           </div>
         )}
 
-        {/* DOCUMENTS VIEW */}
-        {view === "documents" && (
-          <div>
-            <h1 className="text-3xl font-bold mb-6">Documents</h1>
-            <p className="text-gray-300">Document storage will be added here.</p>
-          </div>
-        )}
 
-        {/* FEEDBACK VIEW */}
-        {view === "feedback" && (
-          <div>
-            <h1 className="text-3xl font-bold mb-6">Feedback</h1>
-            <p className="text-gray-300">Feedback center coming soon.</p>
-          </div>
-        )}
       </main>
     </div>
   );
