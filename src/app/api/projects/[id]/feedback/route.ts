@@ -4,8 +4,9 @@ import { prisma } from "@/lib/prisma";
 // GET /api/projects/[id]/feedback - Get all feedback for a project
 export async function GET(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    props: { params: Promise<{ id: string }> }
 ) {
+    const params = await props.params;
     try {
         const feedbacks = await prisma.feedback.findMany({
             where: { projectId: params.id },
@@ -22,11 +23,16 @@ export async function GET(
 // POST /api/projects/[id]/feedback - Create new feedback
 export async function POST(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    props: { params: Promise<{ id: string }> }
 ) {
+    const params = await props.params;
     try {
         const body = await request.json();
         const { text } = body;
+
+        if (!text) {
+            return NextResponse.json({ error: "Text is required" }, { status: 400 });
+        }
 
         const feedback = await prisma.feedback.create({
             data: {

@@ -4,14 +4,18 @@ import { prisma } from "@/lib/prisma";
 // PATCH /api/projects/[id]/feedback/[feedbackId] - Update feedback
 export async function PATCH(
     request: NextRequest,
-    { params }: { params: { id: string; feedbackId: string } }
+    props: { params: Promise<{ id: string; feedbackId: string }> }
 ) {
+    const params = await props.params;
     try {
         const body = await request.json();
         const { text } = body;
 
         const feedback = await prisma.feedback.update({
-            where: { id: params.feedbackId },
+            where: {
+                id: params.feedbackId,
+                projectId: params.id
+            },
             data: { text }
         });
 
@@ -25,11 +29,15 @@ export async function PATCH(
 // DELETE /api/projects/[id]/feedback/[feedbackId] - Delete feedback
 export async function DELETE(
     request: NextRequest,
-    { params }: { params: { id: string; feedbackId: string } }
+    props: { params: Promise<{ id: string; feedbackId: string }> }
 ) {
+    const params = await props.params;
     try {
         await prisma.feedback.delete({
-            where: { id: params.feedbackId }
+            where: {
+                id: params.feedbackId,
+                projectId: params.id
+            }
         });
 
         return NextResponse.json({ success: true });

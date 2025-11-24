@@ -1,5 +1,5 @@
 export { default } from "next-auth/middleware";
 
 export const config = {
-  matcher: ["/((?!login|api/auth|_next|favicon.ico|public).*)"],
+  matcher: ["/((?!login|api|_next|favicon.ico|public).*)"],
 };

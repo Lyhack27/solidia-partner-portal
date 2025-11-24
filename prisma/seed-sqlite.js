@@ -34,6 +34,23 @@ async function main() {
             update.run(password, role, email);
             console.log('Update done');
         }
+
+        // Seed Project
+        const projectId = 'solar-automation-project';
+        const projectStmt = db.prepare(`
+            INSERT OR IGNORE INTO Project (id, name, description, status, createdAt, updatedAt) 
+            VALUES (?, ?, ?, ?, ?, ?)
+        `);
+        const now = new Date().toISOString();
+        const projectInfo = projectStmt.run(
+            projectId,
+            'Solar Automation & AI System',
+            'Full ecosystem for solar battery education, automation & quoting.',
+            'pending',
+            now,
+            now
+        );
+        console.log('Project insert result:', projectInfo);
     } catch (e) {
         console.error('Error inserting user:', e);
     }
