@@ -7,22 +7,26 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+
 model User {
-  id       Int     @id @default(autoincrement())
-  email    String  @unique
+  id       Int             @id @default(autoincrement())
+  name     String?
+  email    String          @unique
   password String
-  role     String  @default("partner")
+  role     String          @default("partner")
   notes    Note[]
+  projects ProjectMember[]
 }
 
 model Project {
-  id          String     @id @default(cuid())
+  id          String          @id @default(cuid())
   name        String
   description String?
-  status      String     @default("pending")
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  status      String          @default("pending")
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
   notes       Note[]
+  members     ProjectMember[]
 }
 
 model Note {
@@ -34,6 +38,18 @@ model Note {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model ProjectMember {
+  id        String   @id @default(cuid())
+  projectId String
+  userId    Int
+  role      String   @default("viewer")
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([projectId, userId])
 }
 
 

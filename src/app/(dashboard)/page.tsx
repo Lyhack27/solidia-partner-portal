@@ -13,33 +13,55 @@ export default function Home() {
       <div className="stats-grid">
         <StatCard
           title="Total Projects"
-          value="45"
-          change="+12% from last month"
+          value="0"
+          change="No data"
           icon="📊"
         />
         <StatCard
           title="Active Partners"
-          value="28"
-          change="+5 new this week"
+          value="2"
+          change="No data"
           icon="👥"
         />
         <StatCard
           title="Revenue"
-          value="$181K"
-          change="+18% from last month"
+          value="$0"
+          change="No data"
           icon="💰"
         />
         <StatCard
           title="Completion Rate"
-          value="94%"
-          change="+2% improvement"
+          value="0%"
+          change="No data"
           icon="✅"
+        />
+        <StatCard
+          title="Pending Tasks"
+          value="0"
+          change="No data"
+          icon="📝"
+        />
+        <StatCard
+          title="Client Inquiries"
+          value="0"
+          change="No data"
+          icon="📩"
+        />
+        <StatCard
+          title="System Alerts"
+          value="0"
+          change="No data"
+          icon="⚠️"
+        />
+        <StatCard
+          title="Avg. Response Time"
+          value="0m"
+          change="No data"
+          icon="⏱️"
         />
       </div>
 
-      <div className="charts-section">
-        <ProjectsChart />
-      </div>
+
     </div>
   );
 }

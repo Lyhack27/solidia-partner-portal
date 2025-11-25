@@ -42,11 +42,65 @@ export default function PartnerPortalProject() {
   };
 
   // Load notes when viewing project detail
+  const [members, setMembers] = useState<any[]>([]);
+  const [loadingMembers, setLoadingMembers] = useState(false);
+  const [showAddMember, setShowAddMember] = useState(false);
+  const [newMember, setNewMember] = useState({ name: "", email: "", role: "viewer" });
+
   useEffect(() => {
     if (view === "projectDetail") {
       loadNotes();
+      loadMembers();
     }
   }, [view]);
+
+  const loadMembers = async () => {
+    setLoadingMembers(true);
+    try {
+      const response = await fetch(`/api/projects/${PROJECT_ID}/members`);
+      if (response.ok) {
+        const data = await response.json();
+        setMembers(data);
+      }
+    } catch (error) {
+      console.error("Error loading members:", error);
+    } finally {
+      setLoadingMembers(false);
+    }
+  };
+
+  const handleAddMember = async () => {
+    if (!newMember.email) return;
+
+    try {
+      const response = await fetch(`/api/projects/${PROJECT_ID}/members`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newMember),
+      });
+
+      if (response.ok) {
+        const addedMember = await response.json();
+        // Check if member already exists in list to update or add
+        setMembers(prev => {
+          const exists = prev.find(m => m.user.email === addedMember.user.email);
+          if (exists) {
+            return prev.map(m => m.user.email === addedMember.user.email ? addedMember : m);
+          }
+          return [addedMember, ...prev];
+        });
+        setShowAddMember(false);
+        setNewMember({ name: "", email: "", role: "viewer" });
+        alert("Member added successfully!");
+      } else {
+        const err = await response.json();
+        alert(`Failed to add member: ${err.error || response.statusText}`);
+      }
+    } catch (error) {
+      console.error("Error adding member:", error);
+      alert("Failed to add member.");
+    }
+  };
 
   const loadNotes = async () => {
     setLoadingNotes(true);
@@ -182,6 +236,77 @@ export default function PartnerPortalProject() {
         {view === "projectDetail" && (
           <div>
             <h1 className="text-3xl font-bold mb-6">Solar Automation & AI System</h1>
+
+            {/* Team Section */}
+            <section className="max-w-5xl p-6 rounded-2xl shadow-xl mb-8" style={{ backgroundColor: "#10233f" }}>
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-semibold">👥 Team Members</h2>
+                <button
+                  onClick={() => setShowAddMember(!showAddMember)}
+                  className="px-4 py-2 bg-blue-600 rounded-lg hover:bg-blue-500 transition text-sm font-semibold"
+                >
+                  {showAddMember ? "Cancel" : "+ Add Member"}
+                </button>
+              </div>
+
+              {showAddMember && (
+                <div className="bg-gray-800/50 p-6 rounded-xl mb-6 border border-gray-700">
+                  <h3 className="text-lg font-semibold mb-4">Add New Member</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <input
+                      type="text"
+                      placeholder="Name"
+                      value={newMember.name}
+                      onChange={(e) => setNewMember({ ...newMember, name: e.target.value })}
+                      className="p-2 rounded bg-gray-900 border border-gray-700 text-white"
+                    />
+                    <input
+                      type="email"
+                      placeholder="Email"
+                      value={newMember.email}
+                      onChange={(e) => setNewMember({ ...newMember, email: e.target.value })}
+                      className="p-2 rounded bg-gray-900 border border-gray-700 text-white"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Role (e.g. Developer)"
+                      value={newMember.role}
+                      onChange={(e) => setNewMember({ ...newMember, role: e.target.value })}
+                      className="p-2 rounded bg-gray-900 border border-gray-700 text-white"
+                    />
+                  </div>
+                  <button
+                    onClick={handleAddMember}
+                    className="mt-4 px-6 py-2 bg-green-600 rounded-lg hover:bg-green-500 transition font-semibold"
+                  >
+                    Add to Project
+                  </button>
+                </div>
+              )}
+
+              <div className="space-y-3">
+                {loadingMembers ? (
+                  <p className="text-gray-400">Loading members...</p>
+                ) : members.length > 0 ? (
+                  members.map((member) => (
+                    <div key={member.id} className="flex items-center justify-between bg-gray-800/30 p-4 rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-blue-900 flex items-center justify-center text-blue-200 font-bold">
+                          {member.user.email[0].toUpperCase()}
+                        </div>
+                        <div>
+                          <p className="font-medium text-white">{member.user.name || member.user.email}</p>
+                          <p className="text-xs text-gray-400 capitalize">{member.role} {member.user.name ? `• ${member.user.email}` : ''}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-gray-400">No members yet.</p>
+                )}
+              </div>
+            </section>
+
             <section className="max-w-5xl p-10 rounded-2xl shadow-xl mb-12" style={{ backgroundColor: "#10233f" }}>
               <h2 className="text-2xl font-semibold mb-6">Project Breakdown</h2>
               <div className="p-8 rounded-xl space-y-8" style={{ backgroundColor: "#0e1d35" }}>
