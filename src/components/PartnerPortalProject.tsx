@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { signOut } from "next-auth/react";
+
 
 const PROJECT_ID = "solar-automation-project";
 
@@ -16,7 +16,7 @@ interface Note {
 }
 
 export default function PartnerPortalProject() {
-  const [view, setView] = useState("projects");
+  const [view, setView] = useState("projectDetail");
   const [projectStatus, setProjectStatus] = useState<"pending" | "approved">("pending");
   const [loading, setLoading] = useState(true);
   const [notes, setNotes] = useState<Note[]>([]);
@@ -181,76 +181,57 @@ export default function PartnerPortalProject() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen text-white" style={{ backgroundColor: "#0a1a2f" }}>
+      <div className="flex items-center justify-center min-h-[50vh] text-white">
         Loading...
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen text-white" style={{ backgroundColor: "#0a1a2f" }}>
-      {/* Sidebar */}
-      <aside className="w-64 p-6 flex flex-col gap-6 shadow-lg fixed h-full z-10" style={{ backgroundColor: "#081526" }}>
-        <h2 className="text-xl font-semibold mb-4">SOLIDIA Panel</h2>
-        <nav className="flex flex-col gap-4 text-gray-300 flex-1">
-          <button onClick={() => setView("projects")} className="text-left hover:text-white transition">
-            Projects
-          </button>
-          <button onClick={() => setView("bots")} className="text-left hover:text-white transition">
-            Bots in the Cloud
-          </button>
-        </nav>
+    <div className="w-full text-white">
+      {/* Tabs */}
+      <div className="flex gap-4 mb-6 border-b border-gray-700 pb-2 overflow-x-auto">
         <button
-          onClick={() => signOut({ callbackUrl: "/login" })}
-          className="text-left text-red-400 hover:text-red-300 transition mt-auto flex items-center gap-2"
+          onClick={() => setView("projectDetail")}
+          className={`px-4 py-2 rounded-t-lg transition whitespace-nowrap ${view === "projectDetail"
+            ? "bg-blue-600 text-white font-semibold"
+            : "text-gray-400 hover:text-white"
+            }`}
         >
-          <span>🚪</span> Logout
+          Project Details
         </button>
-      </aside>
+        <button
+          onClick={() => setView("bots")}
+          className={`px-4 py-2 rounded-t-lg transition whitespace-nowrap ${view === "bots"
+            ? "bg-blue-600 text-white font-semibold"
+            : "text-gray-400 hover:text-white"
+            }`}
+        >
+          Bots in the Cloud
+        </button>
+      </div>
 
       {/* Main Content */}
-      <main className="flex-1 p-8 ml-64">
-        {/* Projects List */}
-        {view === "projects" && (
-          <div>
-            <h1 className="text-3xl font-bold mb-6">Projects</h1>
-            <section className="max-w-5xl p-10 rounded-2xl shadow-xl mb-12" style={{ backgroundColor: "#10233f" }}>
-              <h2 className="text-2xl font-semibold mb-6">Project: Solar Automation & AI System</h2>
-            </section>
-            <section className="max-w-5xl">
-              <h2 className="text-2xl font-semibold mb-6">Active Projects</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="p-6 rounded-2xl shadow-lg hover:scale-105 transition-transform cursor-pointer" style={{ backgroundColor: "#0e1d35" }}>
-                  <h3 className="text-xl font-semibold mb-2">Solar Automation & AI System</h3>
-                  <p className="text-sm text-gray-300 mb-4">Full ecosystem for solar battery education, automation & quoting.</p>
-                  <button onClick={() => setView("projectDetail")} className="px-4 py-2 bg-blue-700 rounded-xl">
-                    Open Project
-                  </button>
-                </div>
-              </div>
-            </section>
-          </div>
-        )}
-
+      <div className="w-full">
         {/* Project Detail */}
         {view === "projectDetail" && (
-          <div>
-            <h1 className="text-3xl font-bold mb-6">Solar Automation & AI System</h1>
+          <div className="animate-in fade-in duration-500">
+            <h1 className="text-2xl md:text-3xl font-bold mb-6">Solar Automation & AI System</h1>
 
             {/* Team Section */}
-            <section className="max-w-5xl p-6 rounded-2xl shadow-xl mb-8" style={{ backgroundColor: "#10233f" }}>
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-semibold">👥 Team Members</h2>
+            <section className="w-full p-4 md:p-6 rounded-2xl shadow-xl mb-8" style={{ backgroundColor: "#10233f" }}>
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+                <h2 className="text-xl md:text-2xl font-semibold">👥 Team Members</h2>
                 <button
                   onClick={() => setShowAddMember(!showAddMember)}
-                  className="px-4 py-2 bg-blue-600 rounded-lg hover:bg-blue-500 transition text-sm font-semibold"
+                  className="px-4 py-2 bg-blue-600 rounded-lg hover:bg-blue-500 transition text-sm font-semibold w-full md:w-auto"
                 >
                   {showAddMember ? "Cancel" : "+ Add Member"}
                 </button>
               </div>
 
               {showAddMember && (
-                <div className="bg-gray-800/50 p-6 rounded-xl mb-6 border border-gray-700">
+                <div className="bg-gray-800/50 p-4 md:p-6 rounded-xl mb-6 border border-gray-700">
                   <h3 className="text-lg font-semibold mb-4">Add New Member</h3>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <input
@@ -258,26 +239,26 @@ export default function PartnerPortalProject() {
                       placeholder="Name"
                       value={newMember.name}
                       onChange={(e) => setNewMember({ ...newMember, name: e.target.value })}
-                      className="p-2 rounded bg-gray-900 border border-gray-700 text-white"
+                      className="p-2 rounded bg-gray-900 border border-gray-700 text-white w-full"
                     />
                     <input
                       type="email"
                       placeholder="Email"
                       value={newMember.email}
                       onChange={(e) => setNewMember({ ...newMember, email: e.target.value })}
-                      className="p-2 rounded bg-gray-900 border border-gray-700 text-white"
+                      className="p-2 rounded bg-gray-900 border border-gray-700 text-white w-full"
                     />
                     <input
                       type="text"
                       placeholder="Role (e.g. Developer)"
                       value={newMember.role}
                       onChange={(e) => setNewMember({ ...newMember, role: e.target.value })}
-                      className="p-2 rounded bg-gray-900 border border-gray-700 text-white"
+                      className="p-2 rounded bg-gray-900 border border-gray-700 text-white w-full"
                     />
                   </div>
                   <button
                     onClick={handleAddMember}
-                    className="mt-4 px-6 py-2 bg-green-600 rounded-lg hover:bg-green-500 transition font-semibold"
+                    className="mt-4 px-6 py-2 bg-green-600 rounded-lg hover:bg-green-500 transition font-semibold w-full md:w-auto"
                   >
                     Add to Project
                   </button>
@@ -289,14 +270,14 @@ export default function PartnerPortalProject() {
                   <p className="text-gray-400">Loading members...</p>
                 ) : members.length > 0 ? (
                   members.map((member) => (
-                    <div key={member.id} className="flex items-center justify-between bg-gray-800/30 p-4 rounded-lg">
+                    <div key={member.id} className="flex flex-col md:flex-row items-start md:items-center justify-between bg-gray-800/30 p-4 rounded-lg gap-2">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-blue-900 flex items-center justify-center text-blue-200 font-bold">
+                        <div className="w-10 h-10 rounded-full bg-blue-900 flex items-center justify-center text-blue-200 font-bold shrink-0">
                           {member.user.email[0].toUpperCase()}
                         </div>
-                        <div>
-                          <p className="font-medium text-white">{member.user.name || member.user.email}</p>
-                          <p className="text-xs text-gray-400 capitalize">{member.role} {member.user.name ? `• ${member.user.email}` : ''}</p>
+                        <div className="overflow-hidden">
+                          <p className="font-medium text-white truncate">{member.user.name || member.user.email}</p>
+                          <p className="text-xs text-gray-400 capitalize truncate">{member.role} {member.user.name ? `• ${member.user.email}` : ''}</p>
                         </div>
                       </div>
                     </div>
@@ -307,27 +288,27 @@ export default function PartnerPortalProject() {
               </div>
             </section>
 
-            <section className="max-w-5xl p-10 rounded-2xl shadow-xl mb-12" style={{ backgroundColor: "#10233f" }}>
-              <h2 className="text-2xl font-semibold mb-6">Project Breakdown</h2>
-              <div className="p-8 rounded-xl space-y-8" style={{ backgroundColor: "#0e1d35" }}>
+            <section className="w-full p-4 md:p-10 rounded-2xl shadow-xl mb-12" style={{ backgroundColor: "#10233f" }}>
+              <h2 className="text-xl md:text-2xl font-semibold mb-6">Project Breakdown</h2>
+              <div className="p-4 md:p-8 rounded-xl space-y-8" style={{ backgroundColor: "#0e1d35" }}>
                 {/* Overview */}
                 <div>
-                  <h3 className="text-xl font-bold mb-3 text-blue-400 flex items-center gap-2">✅ 1. Overview</h3>
-                  <p className="text-gray-300 leading-relaxed">
+                  <h3 className="text-lg md:text-xl font-bold mb-3 text-blue-400 flex items-center gap-2">✅ 1. Overview</h3>
+                  <p className="text-gray-300 leading-relaxed text-sm md:text-base">
                     This proposal outlines a clean, automated, and efficient system to help homeowners in Victoria understand their options, calculate savings, request quotes, and move smoothly toward installation—while reducing manual work for the team and speeding up the sales process.
                   </p>
                 </div>
 
                 {/* System Components */}
                 <div>
-                  <h3 className="text-xl font-bold mb-4 text-blue-400 flex items-center gap-2">✅ 2. System Components</h3>
+                  <h3 className="text-lg md:text-xl font-bold mb-4 text-blue-400 flex items-center gap-2">✅ 2. System Components</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="bg-gray-800/50 p-4 rounded-lg">
                       <h4 className="font-semibold text-white mb-2">1. Main Landing Page</h4>
                       <ul className="list-disc list-inside text-gray-300 space-y-1 text-sm">
                         <li>Clear explanation of the Victoria battery rebate</li>
                         <li>Benefits of adding a battery</li>
-                        <li>Interactive "Savings Calculator"</li>
+                        <li>Interactive &quot;Savings Calculator&quot;</li>
                         <li>Lead capture & AI assistant access</li>
                       </ul>
                     </div>
@@ -360,18 +341,18 @@ export default function PartnerPortalProject() {
 
                 {/* Core Value Proposition */}
                 <div>
-                  <h3 className="text-xl font-bold mb-3 text-blue-400 flex items-center gap-2">✅ 3. Core Value Proposition</h3>
+                  <h3 className="text-lg md:text-xl font-bold mb-3 text-blue-400 flex items-center gap-2">✅ 3. Core Value Proposition</h3>
                   <div className="bg-blue-900/20 border border-blue-500/30 p-4 rounded-lg">
-                    <p className="text-lg text-blue-100 italic text-center">"A smarter, faster, and simpler way to guide homeowners through solar battery upgrades using automation and clear tools."</p>
+                    <p className="text-base md:text-lg text-blue-100 italic text-center">&quot;A smarter, faster, and simpler way to guide homeowners through solar battery upgrades using automation and clear tools.&quot;</p>
                   </div>
                 </div>
 
                 {/* Key Benefits */}
                 <div>
-                  <h3 className="text-xl font-bold mb-3 text-blue-400 flex items-center gap-2">✅ 4. Key Benefits</h3>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  <h3 className="text-lg md:text-xl font-bold mb-3 text-blue-400 flex items-center gap-2">✅ 4. Key Benefits</h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                     {["Less repetitive work", "Better-qualified leads", "Faster sales pipeline", "Professional customer experience", "Scalable structure", "Clean flow from inquiry to installation"].map((b, i) => (
-                      <div key={i} className="flex items-center gap-2 text-gray-300">
+                      <div key={i} className="flex items-center gap-2 text-gray-300 text-sm md:text-base">
                         <span className="text-green-400">✔</span> {b}
                       </div>
                     ))}
@@ -380,11 +361,11 @@ export default function PartnerPortalProject() {
 
                 {/* Deliverables */}
                 <div>
-                  <h3 className="text-xl font-bold mb-3 text-blue-400 flex items-center gap-2">✅ 5. Deliverables</h3>
-                  <ul className="grid grid-cols-1 md:grid-cols-2 gap-2 text-gray-300">
+                  <h3 className="text-lg md:text-xl font-bold mb-3 text-blue-400 flex items-center gap-2">✅ 5. Deliverables</h3>
+                  <ul className="grid grid-cols-1 md:grid-cols-2 gap-2 text-gray-300 text-sm md:text-base">
                     {["Landing page", "AI-powered advisor", "Smart battery calculator", "Full lead conversion funnel", "Lead capture + follow-up system", "Initial educational content", "Internal templates (quotes, checklists)", "ClickUp integration", "Video content → Final project phase"].map((item, i) => (
                       <li key={i} className="flex items-center gap-2">
-                        <span className="w-1.5 h-1.5 bg-blue-500 rounded-full"></span> {item}
+                        <span className="w-1.5 h-1.5 bg-blue-500 rounded-full shrink-0"></span> {item}
                       </li>
                     ))}
                   </ul>
@@ -392,7 +373,7 @@ export default function PartnerPortalProject() {
 
                 {/* Accelerated Timeline */}
                 <div>
-                  <h3 className="text-xl font-bold mb-3 text-blue-400 flex items-center gap-2">✅ 6. Accelerated Timeline</h3>
+                  <h3 className="text-lg md:text-xl font-bold mb-3 text-blue-400 flex items-center gap-2">✅ 6. Accelerated Timeline</h3>
                   <div className="space-y-3">
                     {[
                       { phase: "PHASE 1 — Planning (2–3 days)", desc: "Structure, messaging, funnel map." },
@@ -402,7 +383,7 @@ export default function PartnerPortalProject() {
                       { phase: "PHASE 5 — Video (Post-launch)", desc: "TikTok, reels, short explainers." }
                     ].map((item, i) => (
                       <div key={i} className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 border-b border-gray-700 pb-2 last:border-0">
-                        <span className="font-semibold text-white min-w-[280px]">{item.phase}</span>
+                        <span className="font-semibold text-white min-w-[280px] text-sm md:text-base">{item.phase}</span>
                         <span className="text-gray-400 text-sm">{item.desc}</span>
                       </div>
                     ))}
@@ -410,9 +391,9 @@ export default function PartnerPortalProject() {
                 </div>
 
                 {/* Closing Statement */}
-                <div className="bg-gradient-to-r from-blue-900/40 to-purple-900/40 p-6 rounded-xl border border-blue-500/20">
-                  <h3 className="text-xl font-bold mb-2 text-white flex items-center gap-2">🚀 7. Closing Statement</h3>
-                  <p className="text-gray-200">
+                <div className="bg-gradient-to-r from-blue-900/40 to-purple-900/40 p-4 md:p-6 rounded-xl border border-blue-500/20">
+                  <h3 className="text-lg md:text-xl font-bold mb-2 text-white flex items-center gap-2">🚀 7. Closing Statement</h3>
+                  <p className="text-gray-200 text-sm md:text-base">
                     This system will allow the team to handle more customers with less effort, creating a clear, professional, and automated journey from first contact to installation.
                     <span className="font-semibold text-blue-300 block mt-2">Ready to begin Phase 1 once approved.</span>
                   </p>
@@ -424,7 +405,7 @@ export default function PartnerPortalProject() {
             <div className="flex flex-wrap gap-4 mb-8">
               <button
                 onClick={handleApprove}
-                className={`px-8 py-3 rounded-xl font-bold text-lg transition-all duration-300 shadow-lg ${projectStatus === "approved"
+                className={`px-8 py-3 rounded-xl font-bold text-lg transition-all duration-300 shadow-lg w-full md:w-auto ${projectStatus === "approved"
                   ? "bg-green-700 opacity-50 cursor-not-allowed"
                   : "bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 hover:scale-105 hover:shadow-green-500/50"
                   }`}
@@ -435,8 +416,8 @@ export default function PartnerPortalProject() {
             </div>
 
             {/* Notes Section */}
-            <div className="mt-8 max-w-5xl p-6 rounded-2xl shadow-xl" style={{ backgroundColor: "#10233f" }}>
-              <h3 className="text-xl font-bold mb-3 text-blue-400">📝 Write a Note</h3>
+            <div className="mt-8 w-full p-4 md:p-6 rounded-2xl shadow-xl" style={{ backgroundColor: "#10233f" }}>
+              <h3 className="text-lg md:text-xl font-bold mb-3 text-blue-400">📝 Write a Note</h3>
               <textarea
                 value={noteInput}
                 onChange={e => setNoteInput(e.target.value)}
@@ -446,7 +427,7 @@ export default function PartnerPortalProject() {
               />
               <button
                 onClick={handleAddNote}
-                className="px-6 py-2 bg-blue-600 rounded-md hover:bg-blue-500 transition font-semibold"
+                className="px-6 py-2 bg-blue-600 rounded-md hover:bg-blue-500 transition font-semibold w-full md:w-auto"
               >
                 Add Note
               </button>
@@ -459,14 +440,14 @@ export default function PartnerPortalProject() {
                     <li key={note.id} className="flex flex-col bg-gray-800/50 p-4 rounded-lg border border-gray-700">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
-                          <p className="text-gray-200 mb-2">{note.text}</p>
+                          <p className="text-gray-200 mb-2 text-sm md:text-base">{note.text}</p>
                           <p className="text-xs text-gray-500">
                             {note.user?.email ? `By ${note.user.email} • ` : ''}{new Date(note.createdAt).toLocaleString()}
                           </p>
                         </div>
                         <button
                           onClick={() => handleDeleteNote(note.id)}
-                          className="ml-4 text-red-400 hover:text-red-300 font-semibold transition"
+                          className="ml-4 text-red-400 hover:text-red-300 font-semibold transition text-sm"
                         >
                           Delete
                         </button>
@@ -478,17 +459,13 @@ export default function PartnerPortalProject() {
                 <p className="mt-6 text-gray-400">No notes yet. Add your first note above!</p>
               )}
             </div>
-
-            <button onClick={() => setView("projects")} className="px-6 py-3 bg-gray-600 rounded-xl hover:bg-gray-500 transition mt-8 font-semibold">
-              ← Back to Projects
-            </button>
           </div>
         )}
 
         {/* Bots in the Cloud View */}
         {view === "bots" && (
-          <div>
-            <h1 className="text-3xl font-bold mb-6">Bots in the Cloud</h1>
+          <div className="animate-in fade-in duration-500">
+            <h1 className="text-2xl md:text-3xl font-bold mb-6">Bots in the Cloud</h1>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
               {/* Stats Cards */}
@@ -512,8 +489,8 @@ export default function PartnerPortalProject() {
             </div>
 
             {/* Chart Section */}
-            <div className="p-8 rounded-2xl shadow-xl" style={{ backgroundColor: "#10233f" }}>
-              <h2 className="text-2xl font-semibold mb-6">Bot Activity (Last 7 Days)</h2>
+            <div className="p-4 md:p-8 rounded-2xl shadow-xl" style={{ backgroundColor: "#10233f" }}>
+              <h2 className="text-xl md:text-2xl font-semibold mb-6">Bot Activity (Last 7 Days)</h2>
               <div className="relative h-64 flex items-end justify-around gap-4 border-b border-gray-700 pb-4">
                 {/* Simple bar chart with 7 bars showing 0 activity */}
                 {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day, i) => (
@@ -551,7 +528,7 @@ export default function PartnerPortalProject() {
             </div>
           </div>
         )}
-      </main>
+      </div>
     </div>
   );
 }

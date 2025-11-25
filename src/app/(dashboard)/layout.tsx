@@ -1,4 +1,4 @@
-import Sidebar from "../sidebar";
+import DashboardLayoutClient from "./DashboardLayoutClient";
 
 export default function DashboardLayout({
     children,
@@ -6,11 +6,8 @@ export default function DashboardLayout({
     children: React.ReactNode;
 }) {
     return (
-        <div className="flex min-h-screen bg-[#0a1a2f]">
-            <Sidebar />
-            <main className="flex-1 p-8 overflow-y-auto">
-                {children}
-            </main>
-        </div>
+        <DashboardLayoutClient>
+            {children}
+        </DashboardLayoutClient>
     );
 }

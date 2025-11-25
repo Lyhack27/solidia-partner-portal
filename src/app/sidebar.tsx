@@ -1,16 +1,26 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 export default function Sidebar() {
   const router = useRouter();
 
   return (
     <aside
-      className="w-64 p-6 flex flex-col gap-6 shadow-lg text-white"
+      className="w-64 h-full p-6 flex flex-col gap-6 shadow-lg text-white overflow-y-auto"
       style={{ backgroundColor: "#081526" }}
     >
-      <h2 className="text-xl font-semibold mb-4">SOLIDIA Panel</h2>
+      <div className="mb-4 flex justify-center">
+        <Image
+          src="/logo.png"
+          alt="SOLIDIA Logo"
+          width={150}
+          height={50}
+          className="object-contain"
+          priority
+        />
+      </div>
 
       <nav className="flex flex-col gap-4 text-gray-300">
         <button onClick={() => router.push("/dashboard")} className="text-left hover:text-white">

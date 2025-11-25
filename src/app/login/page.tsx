@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
@@ -46,12 +47,19 @@ export default function LoginPage() {
       style={{ backgroundColor: "#0a1a2f" }}
     >
       <div
-        className="p-10 rounded-2xl shadow-xl w-full max-w-md"
+        className="p-6 md:p-10 rounded-2xl shadow-xl w-full max-w-md"
         style={{ backgroundColor: "#081526" }}
       >
-        <h1 className="text-3xl font-bold text-center text-white mb-8">
-          SOLIDIA Portal Login
-        </h1>
+        <div className="flex justify-center mb-8">
+          <Image
+            src="/logo.png"
+            alt="SOLIDIA Logo"
+            width={200}
+            height={60}
+            className="object-contain"
+            priority
+          />
+        </div>
 
         {/* ERROR MESSAGE */}
         {error && (
@@ -88,16 +96,7 @@ export default function LoginPage() {
           </button>
         </form>
 
-        {/* DIVIDER */}
-        <div className="my-6 text-center text-gray-500">OR</div>
 
-        {/* GOOGLE LOGIN */}
-        <button
-          onClick={() => signIn("google", { callbackUrl: "/projects/solar-automation-project" })}
-          className="w-full py-3 bg-white text-black rounded-lg font-semibold hover:bg-gray-200 transition"
-        >
-          Login with Google
-        </button>
       </div>
     </div>
   );
