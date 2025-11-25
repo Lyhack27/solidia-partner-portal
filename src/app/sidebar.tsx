@@ -12,13 +12,11 @@ export default function Sidebar() {
       style={{ backgroundColor: "#081526" }}
     >
       <div className="mb-4 flex justify-center">
-        <Image
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
           src="/logo.png"
           alt="SOLIDIA Logo"
-          width={150}
-          height={50}
-          className="object-contain"
-          priority
+          style={{ width: "150px", height: "auto", objectFit: "contain" }}
         />
       </div>
 

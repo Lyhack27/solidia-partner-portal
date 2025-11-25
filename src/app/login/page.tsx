@@ -51,13 +51,11 @@ export default function LoginPage() {
         style={{ backgroundColor: "#081526" }}
       >
         <div className="flex justify-center mb-8">
-          <Image
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
             src="/logo.png"
             alt="SOLIDIA Logo"
-            width={200}
-            height={60}
-            className="object-contain"
-            priority
+            style={{ width: "200px", height: "auto", objectFit: "contain" }}
           />
         </div>
 
