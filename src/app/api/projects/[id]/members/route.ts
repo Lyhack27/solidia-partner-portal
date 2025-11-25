@@ -1,11 +1,12 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcrypt";
 
 export async function POST(
-    request: Request,
-    { params }: { params: { id: string } }
+    request: NextRequest,
+    props: { params: Promise<{ id: string }> }
 ) {
+    const params = await props.params;
     try {
         const { id: projectId } = params;
         const body = await request.json();
@@ -83,9 +84,10 @@ export async function POST(
 }
 
 export async function GET(
-    request: Request,
-    { params }: { params: { id: string } }
+    request: NextRequest,
+    props: { params: Promise<{ id: string }> }
 ) {
+    const params = await props.params;
     try {
         const { id: projectId } = params;
 
