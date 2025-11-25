@@ -52,6 +52,9 @@ COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
 COPY --from=builder --chown=nextjs:nodejs /app/package.json ./package.json
 
 # Create directory for sqlite db and set permissions
+RUN mkdir -p /data && chown -R nextjs:nodejs /data
+
+# Create directory for prisma migrations/schema if needed
 RUN mkdir -p /app/prisma && chown -R nextjs:nodejs /app/prisma
 
 USER nextjs
