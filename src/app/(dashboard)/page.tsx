@@ -61,7 +61,9 @@ export default function Home() {
         />
       </div>
 
-
+      <div className="charts-section">
+        <ProjectsChart />
+      </div>
     </div>
   );
 }
