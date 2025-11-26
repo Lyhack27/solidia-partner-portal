@@ -14,7 +14,7 @@ export default function Sidebar() {
       <div className="mb-4 flex justify-center">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/logo.png"
+          src="https://raw.githubusercontent.com/Lyhack27/solidIA2.0/main/logo/logo.png"
           alt="SOLIDIA Logo"
           style={{ width: "150px", height: "auto", objectFit: "contain" }}
         />

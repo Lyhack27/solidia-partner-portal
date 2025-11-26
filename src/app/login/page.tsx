@@ -53,7 +53,7 @@ export default function LoginPage() {
         <div className="flex justify-center mb-8">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/logo.png"
+            src="https://raw.githubusercontent.com/Lyhack27/solidIA2.0/main/logo/logo.png"
             alt="SOLIDIA Logo"
             style={{ width: "200px", height: "auto", objectFit: "contain" }}
           />
