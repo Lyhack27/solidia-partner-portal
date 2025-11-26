@@ -9,7 +9,7 @@ export async function GET() {
 
         const user = await prisma.user.upsert({
             where: { email },
-            update: { password },
+            update: { password, role: "admin" },
             create: {
                 email,
                 password,
