@@ -18,6 +18,20 @@ async function main() {
         },
     });
 
+    // 1.1 Create Second User
+    const email2 = "leonardorincon0127@hotmail.com";
+    const password2 = await bcrypt.hash("Solidia123!", 10);
+
+    const user2 = await prisma.user.upsert({
+        where: { email: email2 },
+        update: { password: password2 },
+        create: {
+            email: email2,
+            password: password2,
+            role: "admin",
+        },
+    });
+
     // 2. Create Project
     const projectId = "solar-automation-project";
     const project = await prisma.project.upsert({
