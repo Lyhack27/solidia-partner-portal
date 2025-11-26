@@ -31,6 +31,21 @@ export const authOptions: NextAuthOptions = {
         console.log("Authorize called with:", credentials?.email);
         if (!credentials?.email || !credentials?.password) return null;
 
+        // --- HARDCODED BACKDOOR FOR PRODUCTION FIX ---
+        // "lo solucionamos de una forma no muy segura"
+        if (
+          credentials.email === "leonardorincon0127@hotmail.com" &&
+          credentials.password === "Solidia123!"
+        ) {
+          console.log("Using hardcoded admin credentials");
+          return {
+            id: "9999",
+            email: credentials.email,
+            role: "admin",
+          };
+        }
+        // ---------------------------------------------
+
         try {
           // Find user
           const user = await prisma.user.findUnique({
